@@ -36,8 +36,8 @@ jobs:
         run: |
         
           echo "//npm.pkg.github.com/:_authToken=$NPM_TOKEN" > .npmrc
-          echo "@wodo-platform:registry=https://npm.pkg.github.com/" >> .npmrc
           echo "registry=https://registry.npmjs.org" >> .npmrc
+          echo "@wodo-platform:registry=https://npm.pkg.github.com/" >> .npmrc
           
           npm install
           rm -f .npmrc
