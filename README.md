@@ -73,10 +73,10 @@ This is a template/boilerplate repository to speed up development process. New n
 
 The following steps are covered in this guideline:
 
-- Run a local MySQL Instance
-- Genereate your db schema sql file and create your database on the local MySql instance using Prisma framework
-- Build and start your microservices locally, establish database connectivity and run tests
-- Clean up and purge MySQL instance including persistance volumes and configs in cases needed
+- Run a local MySQL Instance.
+- Genereate your db schema sql file and create your database on the local MySql instance using Prisma framework.
+- Build and start your microservices locally, establish database connectivity and run tests.
+- Clean up and purge MySQL instance including persistance volumes and configs in cases needed.
 
 > Note more development lifcyle steps will be added in order to incrase the development efficiency; eg: running integration and automated tests locally.
 
