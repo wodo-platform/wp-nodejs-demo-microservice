@@ -16,7 +16,7 @@ RUN echo "//npm.pkg.github.com/:_authToken=${NPM_TOKEN}" >> .npmrc && \
     npm install  && \
     rm -f .npmrc
 
-RUN npm install
+RUN npm run db:generate
 COPY . .
 RUN npm run build
 

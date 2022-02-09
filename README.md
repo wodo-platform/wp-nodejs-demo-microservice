@@ -54,6 +54,7 @@
 
 - [About](#about)
 - [Technical Overview](#technical-overview)
+  - [Command Reference](#command-reference)
 - [Instantiate MySQL Instance for Development Purpose](#instantiate-mysql-instance-for-development-purpose)
 - [Generate Prisma artifacts](#generate-prisma-artifacts)
 - [Adding wodo npm package dependencies](#adding-wodo-npm-package-dependencies)
@@ -78,7 +79,7 @@ The following steps are covered in this guideline:
 - Build and start your microservices locally, establish database connectivity and run tests.
 - Clean up and purge MySQL instance including persistance volumes and configs in cases needed.
 
-> Note more development lifcyle steps will be added in order to incrase the development efficiency; eg: running integration and automated tests locally.
+> Note: More development lifcyle steps will be added in order to incrase the development efficiency; eg: running integration and automated tests locally.
 
 ## Technical Overview
 
@@ -86,41 +87,48 @@ The repo infrastcuture relies on docker-compose tool to configure/instantiate da
 
 > Note: Please review and configure ".env" file in advance. The file is crucial for MySQL DB configurations, prisma framework schema generation and your microservice at runtime.  
 
-You will find detaled inforamtion about each step of development lifecycle. It is briefly described below as a reference point. You need to work in the project root directory.
+You will find detailed inforamtion about each step of the development lifecycle. It is briefly described below as a reference point. You need to work in the project root directory.
 
-- Run "docker-compose up" command. It read ".env" file,  builds the MySQL impage from "db" directory and creates your database user and database instance. You will see console outputs indicating successfull start of MySQL. Keep the terminal open and start anew terminal to continue.
-- If you set up your db for the first time (or you purged your MySQL instance and now set it up again), you need to give privilages to your MySQL user so that prisma framework can manuplate your database instance. It is one-time task. You do not need to repeat this task each time you run "docker-compose up". 
-    - Run "docker ps" command to find and copy your MySQL container id
-    - Start a MySQL client session with root user, rum command below, enter your root password
+- Run "docker-compose up" command. It reads ".env" file,  builds the MySQL impage from "db" directory and creates your database user and database instance. You will see console outputs indicating successfull start of MySQL. Keep the terminal open and start a new terminal to continue.
+- If you set up your db for the first time (or you purged your MySQL instance and now you set it up again), you need to give privilages to your MySQL user so that Prisma framework can manuplate your MySql DB. It is one-time task. You do not need to repeat this task each time you run "docker-compose up". 
+    - Run **"docker ps"** command to find and copy your MySQL container id
+    - Start a MySQL client session with root user, run command below, enter your root password
       ```bash 
       docker container exec -it <your_container_id> mysql -u root -p
       ```
     - Run the command below on the sql client session to grant privilages to your MySQL DB user (wodo).  
-     ```bash 
+      ```bash 
       GRANT ALL PRIVILEGES ON *.* to 'wodo'@'%';
       flush privileges;
       ```
-    - Terminate the session by running "exit" command
-- Once your MySQL DB is up, run "npm run db:migrate" command to generate your database schema sql files and create your database instance on the running MySQL instance. You need to complete this step in the initial stage or repeat it whenever you do some changes in prisma/schema.prisma" file. "npm run db:migrate" is defined in the package.json file. It eventually executes "dotenv -e ../.env -- npx prisma migrate dev --name init" command. If you repeat the schema generation, you need to rename the migration therefore change the parameter "--name init" with a proper tag, eg "--name user_table_added".
-- Run "npm start" in order to bootstrap your microservice. Prisma framework reads the same ".env" file and establish connection to your MySQL user at runtime. See src\service\prisma.service.ts file for further details
-- Query the api "http://localhost:3000/api/demos" on your browser.It should return an empty list
-- You can run "docker-compose down -v" command to wipe out your MySQL setup and start over.
+    - Terminate the session by running **"exit"** command
+- Once your MySQL DB is up, run **"npm run db:migrate"** command to generate your database schema sql files and create your database instance on the running MySQL instance. You need to complete this step in the initial stage or repeat it whenever you do some changes in **"prisma/schema.prisma"** file. **"npm run db:migrate"** is defined in the package.json file. It eventually executes **"dotenv -e ../.env -- npx prisma migrate dev --name init"** command. If you repeat the schema generation, you need to rename the migration therefore change the parameter prisma\migrations\20220209150351_init with a proper tag, eg "--name user_table_added".
+- Run **"npm start"** in order to bootstrap your microservice. Prisma framework reads the same ".env" file and establish connection to your MySQL user at runtime. See src\service\prisma.service.ts file for further details
+- Query the api **"http://localhost:3000/api/demos"** on your browser.It should return an empty list
+- You can run **"docker-compose down -v"** command to wipe out your MySQL setup and start over.
 
 > Note: When you shut down your MySQL instance, your confs and database instance remains intact. You can run "docker-compose up" again and continue working
 
-**Command Reference**
+### Command Reference
 
 ```bash 
 docker-compose up
 docker ps
 docker container exec -it <your_container_id> mysql -u root -p
-GRANT ALL PRIVILEGES ON *.* to 'wodo'@'%';
-flush privileges;
+  GRANT ALL PRIVILEGES ON *.* to 'wodo'@'%';
+  flush privileges;
 npm run db:migrate
 npm run db:generate
 npm start
+```
+
+In case you want to purge MySql setup
+
+```bash 
 docker-compose down -v
 ```
+
+
 
 ## Instantiate MySQL Instance for Development Purpose
 
@@ -294,13 +302,13 @@ Along with build and run functionality on your command line, we need to build do
 In your repo root folder, run the following command with your own git token. It will build docker image and add it to your configured docker registery on your laptop
 
 ```bash
-$ docker build -t wp-nodejs-demo-service --build-arg NPM_TOKEN=your_token . 
+$ docker build -t wp-nodejs-demo-microservice --build-arg NPM_TOKEN=your_token . 
 ```
 
 To run the nodejs app on your local laptop, you can run the wollowinf command
 
 ```bash
-$ docker run -dp 8080:3000 wp-nodejs-demo-service
+$ docker run -dp 8080:3000 wp-nodejs-demo-microservice
 ```
 
 Open the url "http://localhost:8080/api/demos" and "http://localhost:8080/docs" in your browser to see API and swagger doc.
