@@ -10,7 +10,9 @@ import { WPErrorsInterceptor } from '@wodo-platform/wp-shared-lib/dist/wodoplatf
 
 @Module({
   imports: [
-    ConfigModule.forRoot(),
+    ConfigModule.forRoot({
+      isGlobal: true,
+    }),
     ScheduleModule.forRoot(),
     DemoModule,
     RouterModule.register([
