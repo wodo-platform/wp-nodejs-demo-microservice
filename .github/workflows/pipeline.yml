@@ -34,11 +34,8 @@ jobs:
 
       - name: Install dependencies
         run: |
-        
-          echo "//npm.pkg.github.com/:_authToken=$NPM_TOKEN" > .npmrc
-          echo "registry=https://registry.npmjs.org" >> .npmrc
-          echo "@wodo-platform:registry=https://npm.pkg.github.com/" >> .npmrc
-          
+          echo "@wodo-platform:registry=https://npm.pkg.github.com/" > .npmrc
+          echo "//npm.pkg.github.com/:_authToken=$NPM_TOKEN" >> .npmrc
           npm install
           rm -f .npmrc
         env:
