@@ -80,7 +80,7 @@ The following steps are covered in this guideline:
 - Build and start your microservices locally, establish database connectivity and run tests.
 - Clean up and purge MySQL instance including persistance volumes and configs in cases needed.
 
-> Note: More development lifcyle steps will be added in order to incrase the development efficiency; eg: running integration and automated tests locally.
+> Note: More development lifecyle steps will be added in order to incrase the development efficiency; eg: running integration and automated tests locally.
 
 ## Technical Overview
 
