@@ -1,5 +1,5 @@
 import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
-import { PrismaService } from '../../service/prisma.service';
+import { PrismaService } from '../service/prisma.service';
 import { DemoService } from './demo.service';
 import { DemoController } from './demo.controller';
 

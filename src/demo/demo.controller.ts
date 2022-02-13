@@ -1,11 +1,11 @@
 import { Demo } from '@prisma/client';
 import { Get, Post, Body, Put, Delete, Param, Query, Controller, HttpCode,ParseIntPipe, ParseBoolPipe } from '@nestjs/common';
 import { ApiBearerAuth, ApiOperation, ApiResponse, ApiTags, ApiParam } from '@nestjs/swagger';
-import { DemoCreateDto } from '../../dto/demo/demo.create.dto';
-import { DemoUpdateDto } from '../../dto/demo/demo.update.dto';
+import { DemoCreateDto } from './dto/demo.create.dto';
+import { DemoUpdateDto } from './dto/demo.update.dto';
 import { DemoService } from './demo.service';
-import { ValidationPipe } from '../../common/pipes/validation.pipe';
-import {VALIDATION_SCHEMA_DEMO_CREATE, VALIDATION_SCHEMA_DEMO_UPDATE} from "../../common/pipes/validation"
+import { ValidationPipe } from '../common/pipes/validation.pipe';
+import {VALIDATION_SCHEMA_DEMO_CREATE, VALIDATION_SCHEMA_DEMO_UPDATE} from "../common/pipes/validation"
 
 
 @ApiBearerAuth()

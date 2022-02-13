@@ -53,12 +53,19 @@
 <h3> Table of Contents </h3> 
 
 - [About](#about)
+- [Development Environment](#development-environment)
 - [Technical Overview](#technical-overview)
   - [Dev Lifecycle Steps](#dev-lifecycle-steps)
   - [Command Reference](#command-reference)
 - [Instantiate MySQL Instance for Development Purpose](#instantiate-mysql-instance-for-development-purpose)
 - [Generate Prisma artifacts](#generate-prisma-artifacts)
-- [Adding wodo npm package dependencies](#adding-wodo-npm-package-dependencies)
+- [NestJS framework & Development Best Practices](#nestjs-framework--development-best-practices)
+  - [NestJS Fundamentals](#nestjs-fundamentals)
+  - [Add a new NestJS Module](#add-a-new-nestjs-module)
+  - [Validation & Error Codes](#validation--error-codes)
+  - [Unit Tests & Integration Tests](#unit-tests--integration-tests)
+- [Add wodo npm package dependencies](#add-wodo-npm-package-dependencies)
+  - [Github Actions](#github-actions)
 - [Running the app](#running-the-app)
 - [Building docker image](#building-docker-image)
 - [Publish The Module as NPM Package Locally](#publish-the-module-as-npm-package-locally)
@@ -67,7 +74,7 @@
 
 ----
 
-## About
+# About
 
 This is a template/boilerplate repository to speed up development process. New nodejs microservices application/repositories can be created based on this template. The microservices are built upon NestJS and prisma frameworks. 
 
@@ -75,6 +82,7 @@ This is a template/boilerplate repository to speed up development process. New n
 
 The following steps are covered in this guideline:
 
+- Development environment details
 - Run a local MySQL Instance.
 - Genereate your db schema sql file and create your database on the local MySql instance using Prisma framework.
 - Build and start your microservices locally, establish database connectivity and run tests.
@@ -82,7 +90,51 @@ The following steps are covered in this guideline:
 
 > Note: More development lifecyle steps will be added in order to incrase the development efficiency; eg: running integration and automated tests locally.
 
-## Technical Overview
+# Development Environment
+
+You must have NodeJS version 14.x (includes npm 6.x) installed in your dev environment. 
+
+```bash
+node -v
+npm -v
+npx -v
+```
+
+You can find intallation guidelines at <a href="https://nodejs.org/en/download/">this link.</a>
+
+Wodo platform depends on private npm,docker and helm package repositories hosted on github. If your microservice has dependencies to other wodo npm packages, you must genereate a github token and set up private repository access for your local development environment.
+
+**Generate Github Access Token**
+
+Access to https://github.com/settings/tokens and click "generate new token" button. Add a note for you rtoken and select "No expiration" on Expiration field.
+
+In the scope session, select "repo", "write:packages" and "read:packages" options. Click "generate token" and then copy your token.
+
+> Do not share your token with anyone
+
+**npm login - Private Repo Access**
+
+On your terminal (bash), run the command below to add Wodo private repository to your local npm repo list. You  will be promted to enter
+
+- Username: ${your git username }
+- Password: ${your github token}
+- email: ${your email on your github account}
+
+```bash
+ npm login --scope=@wodo-platform --registry=https://npm.pkg.github.com
+```
+
+The command changes/creates ".npmrc" file in your user home directory. Make sure that you have ".npmrc" file properly created with the content below in your user home directory
+
+```
+//npm.pkg.github.com/:_authToken=your_github_token
+@wodo-platform:registry=https://npm.pkg.github.com
+registry=https://registry.npmjs.org
+```
+
+If any line is missin in your ".npmrc" file, please add it manually. Do double check "your_github_token" is correct on in the file.
+
+# Technical Overview
 
 The repo infrastcuture relies on docker-compose tool to configure/instantiate database layer, and standard nodejs/npm commands to build and run the microservice. All configurations and flow are defined in "docker-compose.yaml", ".env", "prisma/schema.prisma" and "package.json" files in the root project directoy. Please review and study these files to understand the build and test lifecycles. 
 
@@ -90,7 +142,7 @@ The repo infrastcuture relies on docker-compose tool to configure/instantiate da
 
 You will find detailed inforamtion about each step of the development lifecycle in the following sections. It is briefly described below as a reference point. You need to work in the project root directory.
 
-### Dev Lifecycle Steps
+## Dev Lifecycle Steps
 
 1. **MySQL setup:** Run "docker-compose up" command. It reads ".env" file,  builds the MySQL impage from "db" directory and creates your database user and database instance. You will see console outputs indicating successfull start of MySQL. Keep the terminal open and start a new terminal to continue.
 2. **MySQL Access Conf:** If you set up your db for the first time (or you purged your MySQL instance and now you set it up again), you need to give privilages to your MySQL user so that Prisma framework can manuplate your MySql DB. It is one-time task. You do not need to repeat this task each time you run "docker-compose up". 
@@ -115,7 +167,7 @@ You will find detailed inforamtion about each step of the development lifecycle 
 
 > Note: Once you migrate your db and generate prisma client files, your IDE might not recognize the new prisma client because of dependency file cache in the IDE itself. Try to refresh your project and run "npm install" to refresh your dependency tree. You should see your database entity objects in "node_modules\\.prisma\client\index.d.ts" file 
 
-### Command Reference
+## Command Reference
 
 ```bash 
 docker-compose up
@@ -134,9 +186,7 @@ In case you want to purge MySql setup
 docker-compose down -v
 ```
 
-
-
-## Instantiate MySQL Instance for Development Purpose
+# Instantiate MySQL Instance for Development Purpose
 
 We use "docker-compose" to run MySQL instances locally. It is a more comprehensive way to leverage docker. All MySQL configurations are defined in ".env" in the project root directory. The same env file is used by "prisma migrate" which is explained in the next section. Ultimately we consolidate all required configurations in one simple env file.
 
@@ -207,7 +257,7 @@ docker-compose down -v
 ```
 
 
-## Generate Prisma artifacts
+# Generate Prisma artifacts
 
 Prisma Migrate tool needs a running MySQL db instance. If you do not have one, please follow the instructions in the previous section. All required prisma commands are defined in "package.json" file as it is the main build and packaging tool.
 
@@ -263,21 +313,75 @@ The database tables are now set up and the prisma client is generated. For more 
 - https://www.prisma.io/docs/getting-started/setup-prisma/add-to-existing-project-typescript-mysql
 
 
-##  Adding wodo npm package dependencies
+# NestJS framework & Development Best Practices
+
+<a href="https://docs.nestjs.com/">Nest (NestJS) </a> is a framework for building efficient, scalable Node.js server-side applications. All nodejs microservices are built upon NestJS framework in Wodo development ecosystem. Nest provides an out-of-the-box application architecture which allows developers and teams to create highly testable, scalable, loosely coupled, and easily maintainable applications.
+
+**Installation**
+
+The boilerplate microservice already includes all NestJS npm dependencies. You need to install NestJS command line interface to run tasks that helps developers implement NestJS components and configurations.
+
+```bash
+npm i -g @nestjs/cli
+```
+
+## NestJS Fundamentals
+
+A NestJS application contists of modules and each application has at least one module, a root module. The root module is the starting point Nest uses to build the application graph - the internal data structure Nest uses to resolve module and provider relationships and dependencies. Modules are effective ways to organize our business logic. The target architecture employs multiple modules, each encapsulating a closely related set of capabilities.
+
+In project root folder src directory includes fundamental framework components.
+
+- src
+  - app.controller.spec.ts
+  - app.controller.ts
+  - app.module.ts
+  - app.service.ts
+  - main.ts
+
+the main.ts includes an async function, which will bootstrap NestJS application.
+
+The **@Module()** decorator takes a single object whose properties describe the module:
+
+- **providers**	that will be instantiated by the Nest injector and that may be shared at least across this module. All service classes including business logic and persistency classes including database functionalities are in that category
+- **controllers**	the set of controllers defined in this module which have to be instantiated. Default controller type is REST API.
+- **imports**	the list of imported modules that export the providers which are required in this module. It is the way to depend on other modules. 
+- **exports**	the subset of providers that are provided by this module and should be available in other  modules which import this module. You can use either the provider itself or just its token (provide value)
+
+If you look at the imports in app.module.ts file, you will notice "DemoModule". NestJS analysis all modules in the root app module and process all fundamental framework components annotated with framework annotations- "@Controller(), @Injectable() " - ; eg: all controller classes in all modules are instantiated respectively. In that way we can build independent modules, expose REST APIs in separate controller classes. 
+
+<p>
+<img src="images/nestjs_modules_1.png"  alt="Wodo Platform" />
+</p>
+
+## Add a new NestJS Module
+
+To be updated
+
+## Validation & Error Codes
+
+To be updated
+
+## Unit Tests & Integration Tests
+
+To be updated
+
+# Add wodo npm package dependencies
 
 To be able to add internal wodo module as npm dependency, you need to authenticate to git remote npm package repository by logging in to npm, use the npm login command, replacing USERNAME with your GitHub username, TOKEN with your personal access token, and PUBLIC-EMAIL-ADDRESS with your email address.
 
 If GitHub Packages is not your default package registry for using npm and you want to use the npm audit command, we recommend you use the --scope flag with the owner of the package when you authenticate to GitHub Packages.
 
 ```bash
-$ npm login --scope=@wodo-platform --registry=https://npm.pkg.github.com --u your_git_user --p your_token 
+$ npm login --scope=@wodo-platform --registry=https://npm.pkg.github.com 
 ```
+Enter your git username, git token as password and your git email.
 
 Once you login successfully, you can run "npm install" command and start to develop your features. 
 
+## Github Actions
+
 To run the same steps in the gitflow actions we need to create a secret in org level and set a personal access token as secret value so that when we run a repository, it can reach npn package regidtery of another private repository. GITHUB_TOKEN is generated by the gitflows per repository. It can not access to other private repos. We have WODO_TOKEN storing Serhat's personal access token as value today. TODO: It will be fixed later. 
 
-Granting additional permissions
 If you need a token that requires permissions that aren't available in the GITHUB_TOKEN, you can create a personal access token and set it as a secret in your repository:
 
 Use or create a token with the appropriate permissions for that repository. For more information, see "Creating a personal access token."
@@ -286,7 +390,7 @@ Add the token as a secret in your workflow's repository, and refer to it using t
 https://docs.github.com/en/actions/security-guides/automatic-token-authentication#using-the-github_token-in-a-workflow
 
 
-## Running the app
+# Running the app
 
 ```bash
 # development
@@ -295,13 +399,18 @@ $ npm run start
 # watch mode
 $ npm run start:dev
 
+# build for production
+$ npm run build
+
 # production mode
 $ npm run start:prod
 ```
 
-> please see the doc to understand runtime configurations and ".env" inf nestjs framework: https://docs.nestjs.com/techniques/configuration
+Refer to "pacakge.json" file in project root to see further details about the commands
 
-## Building docker image
+> please see the doc to understand runtime configurations and ".env" file config of nestjs framework: https://docs.nestjs.com/techniques/configuration
+
+# Building docker image
 
 Along with build and run functionality on your command line, we need to build docker images as well. It means we need to build your project from scratch while preparing docker images. You need to run "npm login" command during docker build process. In order to achive that we can generate .npmrc file in Dockerfile with ${NPM_TOKEN} argument. We will provide the token as argument NPM_TOKEN to the docker build process. 
 
@@ -319,9 +428,11 @@ $ docker run -dp 8080:3000 wp-nodejs-demo-microservice
 
 Open the url "http://localhost:8080/api/demos" and "http://localhost:8080/docs" in your browser to see API and swagger doc.
 
-## Publish The Module as NPM Package Locally
+# Publish The Module as NPM Package Locally
 
 You may need to publish npm packages from your local dev env in order to speed up development process. It is sort of workaround and you should do clean-up your published package versions since our ffficial github actions will take care of package publishing eventually.
+
+> please do not forget to add "@wodo-platform/"  to name of your module in package.json file in order to publish it to the github npm repo.
 
 Please follow the steps below to publish wodo-nodejs-persistance npm package from your local development environment.
 
@@ -369,10 +480,10 @@ Once the package is published, you can add it to the dependencies list in packag
 More details can be found on <a href="https://docs.github.com/en/packages/working-with-a-github-packages-registry/working-with-the-npm-registry"> this page </a>
 
 
-## CI and Github Workflows
+# CI and Github Workflows
 
 In order to build and package your repo through CI/CD, please have a a look at the file .github/workflows/pipeline.yml under the root project folder. It is preconfigured githubflow. Whenever you push a change onto the main branch, it is triggered. It will be improved to be able to package and release artifacts based on a release process later.
 
-## Next Steps
+# Next Steps
 
 Once you compose your new repo, you can create helm charts in wodo-helm-charts repo then conitinue with local deployment and official CI/CD gitops deployment. Please refer to Wodo Platform Local Dev Environment guide.

@@ -1,8 +1,8 @@
 import supertest, * as request from 'supertest';
 import { Test, TestingModule } from '@nestjs/testing';
 import { PrismaService } from '../src/service/prisma.service';
-import { DemoController } from '../src/module/demo/demo.controller';
-import { DemoService } from '../src/module/demo/demo.service';
+import { DemoController } from '../src/demo/demo.controller';
+import { DemoService } from '../src/demo/demo.service';
 import { mockDeep } from 'jest-mock-extended'
 import { Demo } from '.prisma/client';
 import { INestApplication } from '@nestjs/common';

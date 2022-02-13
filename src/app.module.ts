@@ -4,9 +4,8 @@ import { ScheduleModule } from '@nestjs/schedule';
 import { ConfigModule } from '@nestjs/config';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
-import { DemoModule } from './module/demo/demo.module';
+import { DemoModule } from './demo/demo.module';
 import { WPErrorsInterceptor } from '@wodo-platform/wp-shared-lib/dist/wodoplatform/error/wp.errors.interceptor'
-
 
 @Module({
   imports: [
@@ -14,7 +13,6 @@ import { WPErrorsInterceptor } from '@wodo-platform/wp-shared-lib/dist/wodoplatf
       isGlobal: true,
     }),
     ScheduleModule.forRoot(),
-    DemoModule,
     RouterModule.register([
       {
         path: 'api',
@@ -27,6 +25,7 @@ import { WPErrorsInterceptor } from '@wodo-platform/wp-shared-lib/dist/wodoplatf
     {
       provide: APP_INTERCEPTOR,
       useClass: WPErrorsInterceptor,
-    }, AppService],
+    }, 
+    AppService],
 })
 export class AppModule {}

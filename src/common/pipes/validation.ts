@@ -1,7 +1,7 @@
 import Ajv from "ajv";
 import Ajv2019 from "ajv/dist/2019"
-import {demoCreateValidationSchema} from "../../dto/demo/demo.create.dto.schema";
-import {demoUpdateValidationSchema} from "../../dto/demo/demo.update.dto.schema";
+import {demoCreateValidationSchema} from "../../demo/dto/demo.create.dto.schema";
+import {demoUpdateValidationSchema} from "../../demo/dto/demo.update.dto.schema";
 
 export const ajv = new Ajv2019();
 

@@ -1,5 +1,5 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { PrismaService } from '../../service/prisma.service';
+import { PrismaService } from '../service/prisma.service';
 import { DemoController } from './demo.controller';
 import { DemoService } from './demo.service';
 import { mockDeep } from 'jest-mock-extended'
