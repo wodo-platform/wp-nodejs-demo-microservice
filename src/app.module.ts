@@ -6,6 +6,7 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { DemoModule } from './demo/demo.module';
 import { WPErrorsInterceptor } from '@wodo-platform/wp-shared-lib/dist/wodoplatform/error/wp.errors.interceptor'
+import { DemoUserModule } from './demo-user/demo-user.module';
 
 @Module({
   imports: [
@@ -17,8 +18,9 @@ import { WPErrorsInterceptor } from '@wodo-platform/wp-shared-lib/dist/wodoplatf
       {
         path: 'api',
         module: DemoModule
-      },
+      }
     ]),
+    DemoUserModule,
   ],
   controllers: [AppController],
   providers: [

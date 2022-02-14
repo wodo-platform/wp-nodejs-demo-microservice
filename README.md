@@ -151,9 +151,9 @@ You will find detailed inforamtion about each step of the development lifecycle 
       ```bash 
       docker container exec -it <your_container_id> mysql -u root -p
       ```
-    - Run the command below on the sql client session to grant privilages to your MySQL DB user (wodo).  
+    - Run the command below on the sql client session to grant privilages to your MySQL DB user (wodo_demo).  
       ```bash 
-      GRANT ALL PRIVILEGES ON *.* to 'wodo'@'%';
+      GRANT ALL PRIVILEGES ON *.* to 'wodo_demo'@'%';
       flush privileges;
       ```
     - Terminate the session by running **"exit"** command
@@ -161,7 +161,7 @@ You will find detailed inforamtion about each step of the development lifecycle 
    - **Update your database:** If you add a new entity or change something in **"prisma/schema.prisma"** file, you need to run db migration again to apply your changes to your running DB instance and generate prisma client artifacts again. You need to rename the migration name in "package.json" file therefore change the parameter value "--name init" with a proper tag, eg "--name user_table_added" in the command **"dotenv -e ../.env -- npx prisma migrate dev --name init"**. Run the command **"npm run db:migrate"** again to generate your new migration.
 4. **Start your microservice:** Run **"npm start"** in order to bootstrap your microservice. Prisma framework reads the same ".env" file and establish connection to your MySQL user at runtime. See src\service\prisma.service.ts file for further details
 5. **Query the api** **"http://localhost:3000/api/demos"** on your browser.It should return an empty list
-6. **Clean up:** Optional: You can run **"docker-compose down -v"** command to wipe out your MySQL setup and start over. It does full clean up. If you want to stop your MySQL instance, just hit "ctrl+C" on the mysql terminal.
+6. **Clean up:** Optional: You can run **"docker-compose down --rmi 'all'"** command to wipe out your MySQL setup and start over. It does full clean up. If you want to stop your MySQL instance, just hit "ctrl+C" on the mysql terminal.
 
 > Note: When you shut down your MySQL instance(ctrl+C), your confs and database instance remains intact. You can run "docker-compose up" again and continue working
 
@@ -173,7 +173,7 @@ You will find detailed inforamtion about each step of the development lifecycle 
 docker-compose up
 docker ps
 docker container exec -it <your_container_id> mysql -u root -p
-  GRANT ALL PRIVILEGES ON *.* to 'wodo'@'%';
+  GRANT ALL PRIVILEGES ON *.* to 'wodo_demo'@'%';
   flush privileges;
 npm run db:migrate
 npm run db:generate
@@ -183,7 +183,7 @@ npm start
 In case you want to purge MySql setup
 
 ```bash 
-docker-compose down -v
+docker-compose down --rmi 'all'
 ```
 
 # Instantiate MySQL Instance for Development Purpose
@@ -193,9 +193,9 @@ We use "docker-compose" to run MySQL instances locally. It is a more comprehensi
 ```bash 
 MYSQLDB_ROOT_USER=root
 MYSQLDB_ROOT_PASSWORD=password
-MYSQLDB_WODO_USER=wodo
+MYSQLDB_WODO_USER=wodo_demo
 MYSQLDB_WODO_PASSWORD=123456
-MYSQLDB_WODO_DATABASE=wodo_db
+MYSQLDB_WODO_DATABASE=wodo_demo_db
 MYSQLDB_LOCAL_PORT=3306
 MYSQLDB_DOCKER_PORT=3306
 
@@ -204,7 +204,7 @@ NODE_LOCAL_PORT=3000
 NODE_DOCKER_PORT=3000 
 
 # prisma migarte DB url in the form of DATABASE_URL="mysql://$MYSQLDB_WODO_USER:$MYSQLDB_WODO_PASSWORD@localhost:$MYSQLDB_LOCAL_PORT/$MYSQLDB_WODO_DATABASE"
-DATABASE_URL="mysql://wodo:123456@127.0.0.1:3306/wodo_db"
+DATABASE_URL="mysql://wodo_demo:123456@127.0.0.1:3306/wodo_demo_db"
 ```
 
 We build our own MySql docker image. All definition files are stored in "db" folder. Docker Compose builds the docker image and instantiates it when "docker-compose up" command is executed.
@@ -214,7 +214,7 @@ docker-compose.yaml file contains all definitions/configurations to run MySQL DB
 - "**build:** ./db" --> Builds our own MySQL docker image using the files in db folder.
 - "**command:** --default-authentication-plugin=mysql_native_password" --> Adjust default auth type to "mysql_native_password" since MySQL 8.x version uses sha encrypted auth model by defaul. It is quick tweak to adjust the configuration
 - "**env_file:** ./.env" --> passing our main conf file to docker-compose. The confs are consolidated in one simple file.
-- "**environment:** .... "  --> Setting up root user password, creating wodo user with password and creating default wodo database
+- "**environment:** .... "  --> Setting up root user password, creating wodo_demo user with password and creating default wodo_demo_db database
 - "**ports:** ... " --> Port forwarding from our local env to docker container
 - "**volumes:**" --> Creating persistance storage to not loose MySQL confs and data when we shut MySQL down
 
@@ -240,7 +240,7 @@ docker container exec -it wodo-nodejs-persistence_mysqldb_1 mysql -u root -p
 Once you are connected to MySql command line, run the following commands one by one. We need to give permission to our new user "wodo" to be able to run "prisma migrate" properly.
 
 ```bash 
-GRANT ALL PRIVILEGES ON *.* to 'wodo'@'%';
+GRANT ALL PRIVILEGES ON *.* to 'wodo_demo'@'%';
 flush privileges;
 ```
 
@@ -253,7 +253,7 @@ exit;
 In case you need to wipe out everything and start over, run the following command. It will remove MySql confs, volumes and everything else.
 
 ```bash 
-docker-compose down -v
+docker-compose down --rmi 'all'
 ```
 
 
@@ -275,22 +275,22 @@ Prisma Migrate tool needs a running MySQL db instance. If you do not have one, p
 ".env" file in the project root directory contains the conf parameter "DATABASE_URL" that is needed by "prisma migrate" command. You need to set up correct values based on your definitions. 
 
 ```bash 
-DATABASE_URL="mysql://wodo:123456@127.0.0.1:3306/wodo_db"
+DATABASE_URL="mysql://wodo_demo:123456@127.0.0.1:3306/wodo_demo_db"
 ```
 
 Note: If your DB user does not have proper rights to create a database, please run the following SQL commands with root user. Replace db user "wodo" with your db user.
 
 ```bash 
-GRANT ALL PRIVILEGES ON *.* to 'wodo'@'%';
+GRANT ALL PRIVILEGES ON *.* to 'wodo_demo'@'%';
 flush privileges;
 ```
 
-To create all tables in the new database make the database migration from the prisma schema defined in prisma/schema.prisma
+To create/update all tables in the new database make the database migration from the prisma schema defined in prisma/schema.prisma. Every time you run the migrate task you should provide a new name. If it is not your rist run,  change the "--name init" with something else such as "-name added_user_table"  in the package.json file.
 
 ```bash 
 npm run db:migrate
 ```
-The command invokes the line defined in package.json file. If you are doing an update you need to change --name param value, "init" is not good anymore. 
+The command invokes the line defined in package.json file.
 
 ```bash 
 "db:migrate": "dotenv -e ../.env -- npx prisma migrate dev --name init" 
@@ -355,7 +355,97 @@ If you look at the imports in app.module.ts file, you will notice "DemoModule". 
 
 ## Add a new NestJS Module
 
-To be updated
+NestJS framework has a useful commnad line tool that we already installed. New modules and components can be added using command line commands. It helps to comply with project strcuture and best practicies. Let's add demouser module that will include user specific business logic such as login etc.
+
+The nestjs commnad below generates and/or modifies files based on a schematic. 
+
+```bash
+nest g <schematic> <name> [options]
+```
+
+The commands need to be executed in the project root directory.
+
+1. Add DemoUser module
+   
+   ```bash
+  nest g resource DemoUser
+  ```
+  The command creates src/demo-user/demo-user folder and adds all fundamental components such as modules, provider and controllers. Also the command updates root "app.module.ts" file with the new module definition.
+
+2. Add "api" path configuration for all controllers in demouser module
+   
+   Open "src/app.module.ts" file and register DemoModule in RouterModule module configuration for adding "api" to all REST API paths defined in demouser module. Add the codelines below.
+
+   ```
+   RouterModule.register([
+      {
+        path: 'api',
+        module: DemoModule
+      },
+     {
+        path: 'api',
+        module: DemoUserModule
+      }
+    ])
+   ```
+3. Add new DemoUser entity to prisma/schema.prisma file
+
+   Add the following entity to schema.prisma file
+
+   ```JSON
+   model DemoUser {
+      id            Int        @default(autoincrement()) @id
+      name          String     @unique
+      password      String
+      deleted       Boolean
+      createdAt     DateTime    @default(now())
+      updatedAt     DateTime    @default(now())     
+    }
+   ```
+  Change the "--name init" with something else such as "-name added_user_table"  in the package.json file and then run the following commands to complete DB migration. See [Generate Prisma artifacts](#generate-prisma-artifacts) section for further details
+  
+  ```bash
+  npm run db:migrate
+  npm run db:generate
+  ```
+  > Note: Your IDE might not see the generated prisma client codes. Hence run "npm i" and refresh the project in your IDE.
+
+4. Add DemoUserDto class
+  
+   NestJS framework generates most of the class for us. Still we need to create a general DemoUserDto class to expose daat via REST API. We should not return service or persistency objects used by underlying layers. The final exposed data is almost limited and should be separated. Add src\demo-user\dto\demo-user.dto.ts file with the content below
+
+   ```TypeScript
+   export class DemoUserDto {
+    id: number;
+    name: string;
+    deleted: boolean;
+    createdAt: Date;
+    updatedAt: Date;
+
+    constructor(id: number, name: string,  deleted: boolean, createdAt: Date, updatedAt: Date) {
+        this.id = id;
+        this.name = name;
+        this.deleted = deleted;
+        this.createdAt = createdAt;
+        this.updatedAt = updatedAt;
+    }
+  }
+   ```
+
+5. Bind persistency layer to service layer
+
+  NestJS already provided service layer classes - src\demo-user\demo-user.service.ts -  for us.  You need to inject persistency layer classes - src\service\prisma.service.ts - to service layer now. Open demo-user.service.ts and add constructor as below. 
+  
+  ```TypeScript
+     constructor(private prisma: PrismaService) {}
+  ```
+  NestJS injects a singleton instance of PrismaService automatically. Implement create method and make it async. You need to make controller methods a sync as well.
+
+  ```TypeScript
+   async create(createDemoUserDto: CreateDemoUserDto): Promise<DemoUserDto> 
+  ```
+
+  "create" method returns our new DemoUserDto object. You need to convert DemoUser object to DemoUserDto object in your implementation
 
 ## Validation & Error Codes
 
@@ -430,7 +520,7 @@ Open the url "http://localhost:8080/api/demos" and "http://localhost:8080/docs" 
 
 # Publish The Module as NPM Package Locally
 
-You may need to publish npm packages from your local dev env in order to speed up development process. It is sort of workaround and you should do clean-up your published package versions since our ffficial github actions will take care of package publishing eventually.
+You may need to publish npm packages from your local dev env in order to speed up development process. It is sort of workaround and you should do clean-up your published package versions since our official github actions will take care of package publishing eventually.
 
 > please do not forget to add "@wodo-platform/"  to name of your module in package.json file in order to publish it to the github npm repo.
 
@@ -459,7 +549,7 @@ Publish the package:
 npm publish
 ```
 
-Verif that wodo-nodejs-persistance package has been published successfully with the correct version you provided in package.json file. Go to the page below and make sure that your packge is listed on the  published artifact list
+Verif that wodo-nodejs-demo-microservice package has been published successfully with the correct version you provided in package.json file. Go to the page below and make sure that your packge is listed on the  published artifact list
 
 ```
 https://github.com/orgs/wodo-platform/packages
@@ -467,12 +557,12 @@ https://github.com/orgs/wodo-platform/packages
 
 > You should increase version number when you need to re-publish a new package version.
 
-Once the package is published, you can add it to the dependencies list in package.json file. In order to retrieve the dependency, you must run **"npm login --scope=@Ywodo-platform --registry=https://npm.pkg.github.com
+Once the package is published, you can add it to the dependencies list in package.json file for other projects. In order to retrieve the dependency, you must run **"npm login --scope=@Ywodo-platform --registry=https://npm.pkg.github.com
 "** command at least once in your command prompt.
 
 ```
 "dependencies": {
-        "@wodo-platform/wodo-nodejs-persistance": "1.0.0",
+        "@wodo-platform/wodo-nodejs-demo-microservice": "1.0.0",
 
   }
 ```
