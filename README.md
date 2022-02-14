@@ -367,7 +367,7 @@ The commands need to be executed in the project root directory.
 
 1. Add DemoUser module
    
-   ```bash
+  ```bash
   nest g resource DemoUser
   ```
   The command creates src/demo-user/demo-user folder and adds all fundamental components such as modules, provider and controllers. Also the command updates root "app.module.ts" file with the new module definition.
@@ -415,21 +415,21 @@ The commands need to be executed in the project root directory.
    NestJS framework generates most of the class for us. Still we need to create a general DemoUserDto class to expose daat via REST API. We should not return service or persistency objects used by underlying layers. The final exposed data is almost limited and should be separated. Add src\demo-user\dto\demo-user.dto.ts file with the content below
 
    ```TypeScript
-   export class DemoUserDto {
-    id: number;
-    name: string;
-    deleted: boolean;
-    createdAt: Date;
-    updatedAt: Date;
+    export class DemoUserDto {
+      id: number;
+      name: string;
+      deleted: boolean;
+      createdAt: Date;
+      updatedAt: Date;
 
-    constructor(id: number, name: string,  deleted: boolean, createdAt: Date, updatedAt: Date) {
-        this.id = id;
-        this.name = name;
-        this.deleted = deleted;
-        this.createdAt = createdAt;
-        this.updatedAt = updatedAt;
+      constructor(id: number, name: string,  deleted: boolean, createdAt: Date, updatedAt: Date) {
+          this.id = id;
+          this.name = name;
+          this.deleted = deleted;
+          this.createdAt = createdAt;
+          this.updatedAt = updatedAt;
+      }
     }
-  }
    ```
 
 5. Bind persistency layer to service layer
