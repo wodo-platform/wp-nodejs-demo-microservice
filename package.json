@@ -1,6 +1,6 @@
 {
   "name": "@wodo-platform/wp-nodejs-demo-microservice",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "Demo Microservice template/boilerplate to speed up the development process by providing MySQL instance, the nodejs service template with prisma and nest frameworks",
   "author": "Wodo Platform",
   "repository": {
