@@ -167,7 +167,7 @@ You will find detailed inforamtion about each step of the development lifecycle 
    - **Update your database:** If you add a new entity or change something in **"prisma/schema.prisma"** file, you need to run db migration again to apply your changes to your running DB instance and generate prisma client artifacts again. You need to rename the migration name in "package.json" file therefore change the parameter value "--name init" with a proper tag, eg "--name user_table_added" in the command **"dotenv -e ../.env -- npx prisma migrate dev --name init"**. Run the command **"npm run db:migrate"** again to generate your new migration.
 4. **Start your microservice:** Run **"npm start"** in order to bootstrap your microservice. Prisma framework reads the same ".env" file and establish connection to your MySQL user at runtime. See src/service/prisma.service.ts file for further details
 5. **Query the api** **"http://localhost:3000/api/demos"** on your browser.It should return an empty list
-6. **Clean up:** Optional: You can run **"docker-compose down --rmi 'all'"** command to wipe out your MySQL setup and start over. It does full clean up. If you want to stop your MySQL instance, just hit "ctrl+C" on the mysql terminal.
+6. **Clean up:** Optional: You can run  **"docker-compose down -v"** and **"docker-compose down --rmi 'all'"** commands to wipe out your MySQL setup and start over. It does full clean up. If you want to stop your MySQL instance, just hit "ctrl+C" on the mysql terminal.
 
 > Note: When you shut down your MySQL instance(ctrl+C), your confs and database instance remains intact. You can run "docker-compose up" again and continue working
 
@@ -189,6 +189,7 @@ npm start
 In case you want to purge MySql setup
 
 ```bash 
+docker-compose down -v
 docker-compose down --rmi 'all'
 ```
 
@@ -259,6 +260,7 @@ exit;
 In case you need to wipe out everything and start over, run the following command. It will remove MySql confs, volumes and everything else.
 
 ```bash 
+docker-compose down -v
 docker-compose down --rmi 'all'
 ```
 
