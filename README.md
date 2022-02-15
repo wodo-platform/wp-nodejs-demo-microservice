@@ -384,7 +384,7 @@ The commands need to be executed in the project root directory.
    
    Open "src/app.module.ts" file and register DemoModule in RouterModule module configuration for adding "api" to all REST API paths defined in demouser module. Add the codelines below.
 
-   ```
+   ```TypeScript
    RouterModule.register([
       {
         path: 'api',
@@ -400,7 +400,7 @@ The commands need to be executed in the project root directory.
 
    Add the following entity to schema.prisma file
 
-   ```JSON
+   ```TypeScript
    model DemoUser {
       id            Int        @default(autoincrement()) @id
       name          String     @unique
@@ -459,7 +459,7 @@ The commands need to be executed in the project root directory.
 
 We foster a holistic approach for handling error cases in Wodo Platform. Our platform and solutions are sophisticated and comprised of different pieces. Therefore we reserve error code segments for each solution and component. Error codes are defined in consolidated "error.codes.ts" class of wg-shared-lib repository. We leverage this centrialized module to build our error code library across our environment and microservices. Error messages contains a unique error code and details. Extra fields can be added to error message depending on transport and technology. A sample REST API error message is show below. Additional "statusCode" field is added to imply http error code.
 
-```JSON
+```TypeScript
 {
     "statusCode": 400,
     "message": "Wodo Gaming general validation error.",
@@ -479,7 +479,7 @@ Follow the steps below in order to add error handling to your microservice or ma
 3. **Add wg-shared-lib dependency:** Update/add wg-shared-lib dependency "@wodo-platform/wg-shared-lib": "1.0.10", to dependencies section of package.json file in your microservice. 
 4. **Add Interceptor:** Add src/common/errors.interceptor.ts  provider to provider list of src/app.module.ts file. When you throw errors, the interceptor prepares error details in standard format based on error codes.
 
-```JSON
+```TypeScript
   {
     provide: APP_INTERCEPTOR,
     useClass: ErrorsInterceptor,
@@ -518,7 +518,7 @@ Let's go through sample create-demo-user.dto.ts payload validation.
 
 DTO Class
 
-```JSON
+```TypeScript
   export class CreateDemoUserDto {
 
       name: string;
@@ -533,7 +533,7 @@ DTO Class
 
 AVJ Schema Definition Class src/demo-user/dto/create-demo-user.dto.schema.ts
 
-```JSON
+```TypeScript
 import {JSONSchemaType} from "ajv";
 import { CreateDemoUserDto } from "./create-demo-user.dto";
 
