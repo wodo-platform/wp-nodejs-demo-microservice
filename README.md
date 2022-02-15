@@ -62,7 +62,13 @@
 - [NestJS framework & Development Best Practices](#nestjs-framework--development-best-practices)
   - [NestJS Fundamentals](#nestjs-fundamentals)
   - [Add a new NestJS Module](#add-a-new-nestjs-module)
+    - [Add DemoUser module](#add-demouser-module)
+    - [Add "api" path configuration for all controllers in demouser module](#add-api-path-configuration-for-all-controllers-in-demouser-module)
+    - [Add new DemoUser entity to prisma/schema.prisma file](#add-new-demouser-entity-to-prismaschemaprisma-file)
+    - [Add DemoUserDto class](#add-demouserdto-class)
+    - [Bind persistency layer to service layer](#bind-persistency-layer-to-service-layer)
   - [Validation & Error Codes](#validation--error-codes)
+    - [Validation Pipes](#validation-pipes)
   - [Unit Tests & Integration Tests](#unit-tests--integration-tests)
 - [Add wodo npm package dependencies](#add-wodo-npm-package-dependencies)
   - [Github Actions](#github-actions)
@@ -159,7 +165,7 @@ You will find detailed inforamtion about each step of the development lifecycle 
     - Terminate the session by running **"exit"** command
 3. **Create your database:** Once your MySQL DB is up, run **"npm run db:migrate"** command to generate your database schema sql files and create your database instance on the running MySQL instance. You need to complete this step in the initial stage or repeat it whenever you do some changes in **"prisma/schema.prisma"** file. **"npm run db:migrate"** is defined in the package.json file. It eventually executes **"dotenv -e ../.env -- npx prisma migrate dev --name init"** command. Once the command is executed, you will see generated schema file under **"prisma\migrations\"** folder, eg: prisma\migrations\20220209150351_init.  
    - **Update your database:** If you add a new entity or change something in **"prisma/schema.prisma"** file, you need to run db migration again to apply your changes to your running DB instance and generate prisma client artifacts again. You need to rename the migration name in "package.json" file therefore change the parameter value "--name init" with a proper tag, eg "--name user_table_added" in the command **"dotenv -e ../.env -- npx prisma migrate dev --name init"**. Run the command **"npm run db:migrate"** again to generate your new migration.
-4. **Start your microservice:** Run **"npm start"** in order to bootstrap your microservice. Prisma framework reads the same ".env" file and establish connection to your MySQL user at runtime. See src\service\prisma.service.ts file for further details
+4. **Start your microservice:** Run **"npm start"** in order to bootstrap your microservice. Prisma framework reads the same ".env" file and establish connection to your MySQL user at runtime. See src/service/prisma.service.ts file for further details
 5. **Query the api** **"http://localhost:3000/api/demos"** on your browser.It should return an empty list
 6. **Clean up:** Optional: You can run **"docker-compose down --rmi 'all'"** command to wipe out your MySQL setup and start over. It does full clean up. If you want to stop your MySQL instance, just hit "ctrl+C" on the mysql terminal.
 
@@ -365,14 +371,14 @@ nest g <schematic> <name> [options]
 
 The commands need to be executed in the project root directory.
 
-1. Add DemoUser module
+### Add DemoUser module
    
   ```bash
   nest g resource DemoUser
   ```
   The command creates src/demo-user/demo-user folder and adds all fundamental components such as modules, provider and controllers. Also the command updates root "app.module.ts" file with the new module definition.
 
-2. Add "api" path configuration for all controllers in demouser module
+### Add "api" path configuration for all controllers in demouser module
    
    Open "src/app.module.ts" file and register DemoModule in RouterModule module configuration for adding "api" to all REST API paths defined in demouser module. Add the codelines below.
 
@@ -388,7 +394,7 @@ The commands need to be executed in the project root directory.
       }
     ])
    ```
-3. Add new DemoUser entity to prisma/schema.prisma file
+### Add new DemoUser entity to prisma/schema.prisma file
 
    Add the following entity to schema.prisma file
 
@@ -410,9 +416,9 @@ The commands need to be executed in the project root directory.
   ```
   > Note: Your IDE might not see the generated prisma client codes. Hence run "npm i" and refresh the project in your IDE.
 
-4. Add DemoUserDto class
+### Add DemoUserDto class
   
-   NestJS framework generates most of the class for us. Still we need to create a general DemoUserDto class to expose daat via REST API. We should not return service or persistency objects used by underlying layers. The final exposed data is almost limited and should be separated. Add src\demo-user\dto\demo-user.dto.ts file with the content below
+   NestJS framework generates most of the class for us. Still we need to create a general DemoUserDto class to expose daat via REST API. We should not return service or persistency objects used by underlying layers. The final exposed data is almost limited and should be separated. Add src/demo-user/dto/demo-user.dto.ts file with the content below
 
    ```TypeScript
     export class DemoUserDto {
@@ -432,9 +438,9 @@ The commands need to be executed in the project root directory.
     }
    ```
 
-5. Bind persistency layer to service layer
+### Bind persistency layer to service layer
 
-  NestJS already provided service layer classes - src\demo-user\demo-user.service.ts -  for us.  You need to inject persistency layer classes - src\service\prisma.service.ts - to service layer now. Open demo-user.service.ts and add constructor as below. 
+  NestJS already provided service layer classes - src/demo-user/demo-user.service.ts -  for us.  You need to inject persistency layer classes - src/service/prisma.service.ts - to service layer now. First add "PrismaService" to the providers in src/demo-user/demo-user.module.ts then open demo-user.service.ts and add constructor as below. 
   
   ```TypeScript
      constructor(private prisma: PrismaService) {}
@@ -449,7 +455,121 @@ The commands need to be executed in the project root directory.
 
 ## Validation & Error Codes
 
-To be updated
+We foster a holistic approach for handling error cases in Wodo Platform. Our platform and solutions are sophisticated and comprised of different pieces. Therefore we reserve error code segments for each solution and component. Error codes are defined in consolidated "error.codes.ts" class of wg-shared-lib repository. We leverage this centrialized module to build our error code library across our environment and microservices. Error messages contains a unique error code and details. Extra fields can be added to error message depending on transport and technology. A sample REST API error message is show below. Additional "statusCode" field is added to imply http error code.
+
+```JSON
+{
+    "statusCode": 400,
+    "message": "Wodo Gaming general validation error.",
+    "errorCode": "WG_49",
+    "details": "property:, message:must have required property 'name'"
+}
+```
+
+> WG_49 stands for "Wodo Gaming" error code 49.
+
+The purpose of error code is to determine a unique number with an associated description so that when specific errors are thrown, they are aggregated in log files or returned to 3rd party API clients. Eventually it is much easier to understand root causes with specific error codes.
+
+Follow the steps below in order to add error handling to your microservice or macroservice.
+
+1. **Error code segment:** Determine an error code segment and add it to error.codes.ts class in wg-shared-lib module. 
+2. **Release wg-shared=lib:** Increase version number in package.json file of wg-shared-lib and commit your change. Our CI/CD flow will release your version.
+3. **Add wg-shared-lib dependency:** Update/add wg-shared-lib dependency "@wodo-platform/wg-shared-lib": "1.0.10", to dependencies section of package.json file in your microservice. 
+4. **Add Interceptor:** Add src/common/errors.interceptor.ts  provider to provider list of src/app.module.ts file. When you throw errors, the interceptor prepares error details in standard format based on error codes.
+
+```JSON
+  {
+    provide: APP_INTERCEPTOR,
+    useClass: ErrorsInterceptor,
+  }
+```
+
+### Validation Pipes
+
+A pipe is a class annotated with the @Injectable() decorator, which implements the PipeTransform interface in NestJS framework.Pipes have two typical use cases:
+
+- **transformation:** transform input data to the desired form (e.g., from string to integer)
+- **validation:** evaluate input data and if valid, simply pass it through unchanged; otherwise, throw an exception when the data is incorrect
+
+In both cases, pipes operate on the arguments being processed by a controller route handler. Nest interposes a pipe just before a method is invoked, and the pipe receives the arguments destined for the method and operates on them. Pipes run inside the exceptions zone. This means that when a Pipe throws an exception it is handled by src/common/errors.interceptor.ts.  We use pipes in our controller classes to validate JSON payloads and to dotype conversions.
+
+Nest comes with eight pipes available out-of-the-box.They're exported from the @nestjs/common package.
+
+- ValidationPipe
+- ParseIntPipe
+- ParseFloatPipe
+- ParseBoolPipe
+- ParseArrayPipe
+- ParseUUIDPipe
+- ParseEnumPipe
+- DefaultValuePipe
+
+We leverage [Ajv](https://ajv.js.org/) package to define payload schemas for our DTO objects (JSON payloads). You can consider such schema objest as xsd files in XML parsing. The basic steps to add payload validation
+
+1. Add DTO class and a corresponding schema valdiation class.
+2. Define specific WG_X error codes in "error.codes.ts" class of wg-shared-lib repository as described in the previous section
+3. Register validation schema class to Avj in src/common/pipes/validation.ts class
+4. Add your error code handling logic to src/common/pipes/validation.pipe.ts class
+5. Add your ValidationPipe definition to desired methods in REST API cotnroller classes
+
+Let's go through sample create-demo-user.dto.ts payload validation.
+
+DTO Class
+
+```JSON
+  export class CreateDemoUserDto {
+
+      name: string;
+      password: string;
+
+      constructor(name: string, password: string) {
+          this.name = name;
+          this.password = password;
+      }
+  }
+```     
+
+AVJ Schema Definition Class src/demo-user/dto/create-demo-user.dto.schema.ts
+
+```JSON
+import {JSONSchemaType} from "ajv";
+import { CreateDemoUserDto } from "./create-demo-user.dto";
+
+export const createDemoUserValidationSchema:JSONSchemaType<CreateDemoUserDto> = {
+    
+    type: 'object', 
+    // Type can be: number, integer, string, boolean, array, object or null. see https://ajv.js.org/json-schema.html
+    properties: {
+        name:      { type: "string", minLength : 1 }, 
+        password:  { type: "string" }
+    },
+    required: ["name","password"],
+    additionalProperties: false
+};
+```
+
+AS you notices we added fields of CreateDemoUserDto to properties array with type definition and extra validation cases. Now register the schema in AVJ. Add the following lines to src/common/pipes/validation.ts
+
+```TypeScript
+export const VALIDATION_SCHEMA_DEMO_USER_CREATE = "validation.schema.demo.user.create";
+ajv.addSchema(createDemoUserValidationSchema, VALIDATION_SCHEMA_DEMO_USER_CREATE);
+```
+Add your error handling logic to src/common/pipes/validation.pipe.ts
+
+```TypeScript
+else if(this.validationSchema && this.validationSchema === VALIDATION_SCHEMA_DEMO_USER_CREATE) {
+  wgErrorCode = WG_ERROR_WG_VALIDATION; 
+}
+```
+
+As final step, add your your ValidationPipe to your controller method in src/demo-user/demo-user.controller.ts
+
+```TypeScript
+@Post()
+async create(@Body(new ValidationPipe(VALIDATION_SCHEMA_DEMO_USER_CREATE)) createDemoUserDto: CreateDemoUserDto) : Promise<DemoUserDto> {
+  return await this.demoUserService.create(createDemoUserDto);
+}
+```
 
 ## Unit Tests & Integration Tests
 

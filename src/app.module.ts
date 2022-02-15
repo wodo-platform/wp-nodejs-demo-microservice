@@ -6,6 +6,8 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { DemoModule } from './demo/demo.module';
 import { WPErrorsInterceptor } from '@wodo-platform/wp-shared-lib/dist/wodoplatform/error/wp.errors.interceptor'
+import { ErrorsInterceptor } from '@wodo-platform/wg-shared-lib/dist/wodogaming/error/errors.interceptor'
+
 import { DemoUserModule } from './demo-user/demo-user.module';
 
 @Module({
@@ -18,6 +20,10 @@ import { DemoUserModule } from './demo-user/demo-user.module';
       {
         path: 'api',
         module: DemoModule
+      },
+      {
+        path: 'api',
+        module: DemoUserModule
       }
     ]),
     DemoUserModule,
@@ -26,7 +32,7 @@ import { DemoUserModule } from './demo-user/demo-user.module';
   providers: [
     {
       provide: APP_INTERCEPTOR,
-      useClass: WPErrorsInterceptor,
+      useClass: ErrorsInterceptor,
     }, 
     AppService],
 })
