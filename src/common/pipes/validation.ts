@@ -15,7 +15,7 @@ export const VALIDATION_SCHEMA_DEMO_USER_UPDATE = "validation.schema.demo.user.u
 
 ajv.addSchema(demoCreateValidationSchema, VALIDATION_SCHEMA_DEMO_CREATE);
 ajv.addSchema(demoUpdateValidationSchema, VALIDATION_SCHEMA_DEMO_UPDATE);
-ajv.addSchema(createDemoUserValidationSchema, VALIDATION_SCHEMA_DEMO_USER_CREATE)
-ajv.addSchema(updateDemoUserValidationSchema, VALIDATION_SCHEMA_DEMO_USER_UPDATE)
+ajv.addSchema(createDemoUserValidationSchema, VALIDATION_SCHEMA_DEMO_USER_CREATE);
+ajv.addSchema(updateDemoUserValidationSchema, VALIDATION_SCHEMA_DEMO_USER_UPDATE);
 
 
