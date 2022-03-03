@@ -27,6 +27,7 @@ import { DemoUserModule } from './demo-user/demo-user.module';
       }
     ]),
     DemoUserModule,
+    DemoModule
   ],
   controllers: [AppController],
   providers: [

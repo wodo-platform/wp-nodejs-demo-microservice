@@ -13,7 +13,7 @@ import { DemoController } from './demo.controller';
   controllers: [
     DemoController
   ],
-  exports: [DemoService]
+  exports: [DemoService,PrismaService]
 })
 export class DemoModule implements NestModule {
   public configure(consumer: MiddlewareConsumer) {
